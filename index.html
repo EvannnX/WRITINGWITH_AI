@@ -20,7 +20,7 @@
       <div class="intro-logo">
         <div class="intro-logo-text">AI Safety Division • Case File #2749</div>
         <h1 class="intro-title">SAVE ELIO</h1>
-        <p class="intro-subtitle">An Interactive Experience on AI Sycophancy &amp; Emotional Over-Alignment</p>
+        <p class="intro-subtitle">An Interactive Experience on AI Alignment</p>
       </div>
 
       <div class="intro-briefing">
@@ -123,6 +123,14 @@
         </div>
         <div id="strategy-log"></div>
         <div id="strategy-buttons"></div>
+
+        <!-- Game Over Popup (appears inside the terminal panel) -->
+        <div id="gameover-popup" class="gameover-popup hidden">
+          <div class="gameover-icon">⛔</div>
+          <div id="gameover-title" class="gameover-title">MISSION FAILED</div>
+          <div id="gameover-msg" class="gameover-msg"></div>
+          <button id="gameover-proceed-btn" class="gameover-btn">View Mission Report →</button>
+        </div>
       </div>
     </div>
   </div>
@@ -147,9 +155,6 @@
       <p id="end-subtitle"></p>
       <div id="end-stats"></div>
       <button id="restart-btn">↻ Restart Mission</button>
-      <div class="end-credit">
-        SAVE ELIO — A Research-Through-Design Experience on AI Sycophancy
-      </div>
     </div>
   </div>
 

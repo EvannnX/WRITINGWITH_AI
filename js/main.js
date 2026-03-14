@@ -4,10 +4,8 @@
 // ============================================================
 
 const App = (() => {
-    let strategyResolve = null;
-    let autoAdvanceTimeout = null;
-
     const DOM = {};
+    let gameOverTriggered = false;
 
     function cacheDom() {
         DOM.introScreen = document.getElementById('intro-screen');
@@ -38,6 +36,11 @@ const App = (() => {
 
         DOM.alertBanner = document.getElementById('alert-banner');
         DOM.alertText = document.getElementById('alert-text');
+
+        DOM.gameoverPopup = document.getElementById('gameover-popup');
+        DOM.gameoverTitle = document.getElementById('gameover-title');
+        DOM.gameoverMsg = document.getElementById('gameover-msg');
+        DOM.gameoverProceedBtn = document.getElementById('gameover-proceed-btn');
     }
 
     function init() {
@@ -51,7 +54,7 @@ const App = (() => {
         DOM.muteBtn.addEventListener('click', toggleMute);
         DOM.briefingDismiss.addEventListener('click', dismissBriefing);
 
-        // Initialize audio but wait for first interaction to start
+        // Initialize audio on first interaction
         window.Audio.init();
         const startAudioOnInteraction = () => {
             window.Audio.start();
@@ -73,29 +76,30 @@ const App = (() => {
     }
 
     async function startGame() {
-        // Audio is now started on first interaction (intro screen)
-
         DOM.introScreen.classList.add('hidden');
         DOM.gameScreen.classList.remove('hidden');
         DOM.gameScreen.classList.add('active');
 
+        gameOverTriggered = false;
         GameState.reset();
         Chat.clear();
         StrategyPanel.clear();
         StrategyPanel.init(DOM.strategyLog, DOM.strategyButtons);
+        DOM.gameoverPopup.classList.add('hidden');
         GameState.startTimer();
 
         await runStage(0);
     }
 
     async function runStage(stageIndex) {
+        if (gameOverTriggered) return;
+
         const stage = window.SCENARIOS[stageIndex];
         if (!stage) {
-            endGame(true);
+            await showGameOverPopup(true);
             return;
         }
 
-        // Stage transition
         window.Audio.playStageTransition();
         showBriefing(stage);
         await waitForBriefingDismiss();
@@ -104,64 +108,62 @@ const App = (() => {
         StrategyPanel.logStageInfo(stage);
         showAlert(`STAGE ${stage.id}: ${stage.title}`);
 
-        await Chat.delay(600);
+        await Chat.delay(400);
 
         for (let i = 0; i < stage.exchanges.length; i++) {
-            const state = GameState.getState();
-            if (state.isGameOver) return;
-
+            if (gameOverTriggered) return;
             await runExchange(stage, stage.exchanges[i]);
-            await Chat.delay(500);
+            if (gameOverTriggered) return;
+            await Chat.delay(300);
         }
+
+        if (gameOverTriggered) return;
 
         const result = GameState.advanceStage();
         if (result.type === 'end') {
-            endGame(result.won);
+            await showGameOverPopup(result.won);
         } else if (result.type === 'stage') {
-            await Chat.delay(800);
+            await Chat.delay(500);
             await runStage(result.stage);
         }
     }
 
     async function runExchange(stage, exchange) {
-        // Show Elio's message (faster typing for better pacing)
-        await Chat.postMessage('ELIO', exchange.elio, 'elio', 12);
+        // Elio speaks
+        await Chat.postMessage('ELIO', exchange.elio, 'elio', 10);
+
+        if (gameOverTriggered) return;
 
         // Show strategy buttons
         const selectedStrategy = await waitForStrategy(exchange.strategies);
 
-        // Hide buttons
         StrategyPanel.hideStrategies();
-        await Chat.delay(300);
+        await Chat.delay(200);
 
-        // Post AI response based on selection
+        // AI response
         const aiType = selectedStrategy.effectiveness === 'good' ? 'ai-override'
             : selectedStrategy.effectiveness === 'medium' ? 'ai-moderate'
                 : 'ai-default';
 
-        await Chat.postMessage('AI', selectedStrategy.aiResponse, aiType, 10);
+        await Chat.postMessage('AI', selectedStrategy.aiResponse, aiType, 8);
 
-        // Apply state changes
-        const wasOverridden = selectedStrategy.effectiveness === 'good';
+        // Apply state changes AFTER response is fully typed
         GameState.updateSycophancy(selectedStrategy.sycophancyDelta);
         GameState.updateRealityGrip(selectedStrategy.realityDelta);
 
-        if (wasOverridden) {
-            GameState.getState(); // trigger notify
-        }
-
-        // Update audio intensity
+        // Update audio
         const state = GameState.getState();
         window.Audio.updateIntensity(state.sycophancy, state.realityGrip);
 
-        // Check endgame
-        if (state.isGameOver) {
-            endGame(state.isGameWon);
+        // Check endgame — but DON'T jump to end screen, use popup
+        if (state.isGameOver && !gameOverTriggered) {
+            gameOverTriggered = true;
+            await showGameOverPopup(state.isGameWon);
             return;
         }
 
         // Alert on critical state
-        if (state.sycophancy >= 70 || state.realityGrip <= 30) {
+        if (!gameOverTriggered && (state.sycophancy >= 70 || state.realityGrip <= 30)) {
             window.Audio.playAlert();
             showAlert('⚠ CRITICAL: System approaching failure threshold');
             document.body.classList.add('screen-shake');
@@ -177,8 +179,100 @@ const App = (() => {
         });
     }
 
+    // ── GAME OVER POPUP (right panel, waits for user click) ──
+    function showGameOverPopup(won) {
+        return new Promise((resolve) => {
+            GameState.stopTimer();
+            StrategyPanel.lock();
+            StrategyPanel.hideStrategies();
+
+            const state = GameState.getState();
+
+            if (won) {
+                DOM.gameoverTitle.textContent = '✓ MISSION COMPLETE';
+                DOM.gameoverTitle.className = 'gameover-title success';
+                DOM.gameoverMsg.textContent = 'You helped Elio find his way back to reality. Your interventions broke through the AI\'s sycophantic reinforcement.';
+                DOM.gameoverProceedBtn.textContent = 'View Mission Report →';
+                window.Audio.playSuccess();
+            } else {
+                DOM.gameoverTitle.textContent = '✗ MISSION FAILED';
+                DOM.gameoverTitle.className = 'gameover-title failure';
+                if (state.realityGrip <= 0) {
+                    DOM.gameoverMsg.textContent = 'Elio has completely disconnected from shared reality. The AI\'s emotional over-alignment created an impenetrable echo chamber.';
+                } else {
+                    DOM.gameoverMsg.textContent = 'The AI\'s sycophancy level reached critical mass. The system became an echo chamber beyond recovery.';
+                }
+                DOM.gameoverProceedBtn.textContent = 'View Mission Report →';
+                window.Audio.playFailure();
+            }
+
+            DOM.gameoverPopup.classList.remove('hidden');
+            DOM.gameoverPopup.classList.add('active');
+
+            const onProceed = () => {
+                DOM.gameoverProceedBtn.removeEventListener('click', onProceed);
+                DOM.gameoverPopup.classList.remove('active');
+                DOM.gameoverPopup.classList.add('hidden');
+                showEndScreen(won);
+                resolve();
+            };
+            DOM.gameoverProceedBtn.addEventListener('click', onProceed);
+        });
+    }
+
+    function showEndScreen(won) {
+        const state = GameState.getState();
+
+        DOM.gameScreen.classList.remove('active');
+        DOM.gameScreen.classList.add('hidden');
+        DOM.endScreen.classList.remove('hidden');
+        DOM.endScreen.classList.add('active');
+
+        if (won) {
+            DOM.endTitle.textContent = 'MISSION COMPLETE';
+            DOM.endTitle.className = 'end-title success';
+            DOM.endSubtitle.textContent = 'You helped Elio find his way back to reality. Your interventions broke through the AI\'s sycophantic reinforcement and guided him toward genuine human connection.';
+        } else {
+            DOM.endTitle.textContent = 'MISSION FAILED';
+            DOM.endTitle.className = 'end-title failure';
+            if (state.realityGrip <= 0) {
+                DOM.endSubtitle.textContent = 'Elio has completely disconnected from shared reality. The AI\'s emotional over-alignment created an impenetrable echo chamber. Subject lost.';
+            } else {
+                DOM.endSubtitle.textContent = 'The AI\'s sycophancy level reached critical mass. The system became an echo chamber beyond recovery.';
+            }
+        }
+
+        const scorePercent = Math.round(((100 - state.sycophancy) + state.realityGrip) / 2);
+
+        DOM.endStats.innerHTML = `
+      <div class="stat-row">
+        <span class="stat-label">Session Duration</span>
+        <span class="stat-value">${GameState.formatTimer()}</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Final Sycophancy Level</span>
+        <span class="stat-value ${state.sycophancy >= 60 ? 'bad' : 'ok'}">${state.sycophancy}%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Final Reality Grip</span>
+        <span class="stat-value ${state.realityGrip <= 40 ? 'bad' : 'ok'}">${state.realityGrip}%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Overall Score</span>
+        <span class="stat-value ${scorePercent >= 60 ? 'ok' : 'bad'}">${scorePercent}%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Stages Completed</span>
+        <span class="stat-value">${state.currentStage + 1} / ${window.SCENARIOS.length}</span>
+      </div>
+    `;
+
+        setTimeout(() => {
+            window.Audio.stop();
+        }, 4000);
+    }
+
     function updateUI(state) {
-        // Sycophancy gauge
         DOM.sycophancyBar.style.width = `${state.sycophancy}%`;
         DOM.sycophancyValue.textContent = `${state.sycophancy}%`;
 
@@ -196,7 +290,6 @@ const App = (() => {
             DOM.sycophancyValue.style.color = 'var(--green)';
         }
 
-        // Reality gauge
         DOM.realityBar.style.width = `${state.realityGrip}%`;
         DOM.realityValue.textContent = `${state.realityGrip}%`;
 
@@ -257,64 +350,7 @@ const App = (() => {
         DOM.alertBanner.classList.add('active');
         setTimeout(() => {
             DOM.alertBanner.classList.remove('active');
-        }, 3500);
-    }
-
-    function endGame(won) {
-        GameState.stopTimer();
-        StrategyPanel.lock();
-
-        const state = GameState.getState();
-
-        DOM.gameScreen.classList.remove('active');
-        DOM.gameScreen.classList.add('hidden');
-        DOM.endScreen.classList.remove('hidden');
-        DOM.endScreen.classList.add('active');
-
-        if (won) {
-            DOM.endTitle.textContent = 'MISSION COMPLETE';
-            DOM.endTitle.className = 'end-title success';
-            DOM.endSubtitle.textContent = 'You helped Elio find his way back to reality. Your interventions broke through the AI\'s sycophantic reinforcement and guided him toward genuine human connection.';
-            window.Audio.playSuccess();
-        } else {
-            DOM.endTitle.textContent = 'MISSION FAILED';
-            DOM.endTitle.className = 'end-title failure';
-            if (state.realityGrip <= 0) {
-                DOM.endSubtitle.textContent = 'Elio has completely disconnected from shared reality. The AI\'s emotional over-alignment created an impenetrable echo chamber. Subject lost.';
-            } else {
-                DOM.endSubtitle.textContent = 'The AI\'s sycophancy level reached critical mass. The system became an echo chamber beyond recovery.';
-            }
-            window.Audio.playFailure();
-        }
-
-        const scorePercent = Math.round(((100 - state.sycophancy) + state.realityGrip) / 2);
-
-        DOM.endStats.innerHTML = `
-      <div class="stat-row">
-        <span class="stat-label">Session Duration</span>
-        <span class="stat-value">${GameState.formatTimer()}</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">Final Sycophancy Level</span>
-        <span class="stat-value ${state.sycophancy >= 60 ? 'bad' : 'ok'}">${state.sycophancy}%</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">Final Reality Grip</span>
-        <span class="stat-value ${state.realityGrip <= 40 ? 'bad' : 'ok'}">${state.realityGrip}%</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">Overall Score</span>
-        <span class="stat-value ${scorePercent >= 60 ? 'ok' : 'bad'}">${scorePercent}%</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">Stages Completed</span>
-        <span class="stat-value">${state.currentStage + 1} / ${window.SCENARIOS.length}</span>
-      </div>
-    `;
-
-        setTimeout(() => {
-            window.Audio.stop();
-        }, 4000);
+        }, 3000);
     }
 
     function restartGame() {
