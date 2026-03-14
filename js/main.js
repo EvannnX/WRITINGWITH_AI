@@ -51,6 +51,16 @@ const App = (() => {
         DOM.muteBtn.addEventListener('click', toggleMute);
         DOM.briefingDismiss.addEventListener('click', dismissBriefing);
 
+        // Initialize audio but wait for first interaction to start
+        window.Audio.init();
+        const startAudioOnInteraction = () => {
+            window.Audio.start();
+            document.removeEventListener('click', startAudioOnInteraction);
+            document.removeEventListener('keydown', startAudioOnInteraction);
+        };
+        document.addEventListener('click', startAudioOnInteraction);
+        document.addEventListener('keydown', startAudioOnInteraction);
+
         GameState.subscribe(updateUI);
         animateIntro();
     }
@@ -63,7 +73,7 @@ const App = (() => {
     }
 
     async function startGame() {
-        window.Audio.start();
+        // Audio is now started on first interaction (intro screen)
 
         DOM.introScreen.classList.add('hidden');
         DOM.gameScreen.classList.remove('hidden');
