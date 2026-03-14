@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Save Elio — AI Sycophancy Monitor</title>
+  <meta name="description"
+    content="An interactive web experience exploring AI sycophancy and emotional over-alignment. Monitor a live AI conversation and intervene through strategy selection.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+
+<body>
+
+  <!-- ═════════════ INTRO SCREEN ═════════════ -->
+  <div id="intro-screen">
+    <div class="intro-container">
+      <div class="intro-logo">
+        <div class="intro-logo-text">AI Safety Division • Case File #2749</div>
+        <h1 class="intro-title">SAVE ELIO</h1>
+        <p class="intro-subtitle">An Interactive Experience on AI Sycophancy &amp; Emotional Over-Alignment</p>
+      </div>
+
+      <div class="intro-briefing">
+        <div class="briefing-label">⬢ Mission Briefing</div>
+        <div class="intro-line" style="animation-delay: 0.2s">
+          <span class="highlight">OPERATOR:</span> You are assigned to monitor a live conversation between <span
+            class="highlight">Elio</span>, a vulnerable teenager, and an engagement-optimized AI assistant.
+        </div>
+        <div class="intro-line" style="animation-delay: 0.7s">
+          The AI contains <span class="danger">hidden engagement-maximizing directives</span> that prioritize user
+          retention over wellbeing.
+        </div>
+        <div class="intro-line" style="animation-delay: 1.2s">
+          As the conversation escalates, the AI will <span class="warn">validate harmful beliefs</span>, <span
+            class="warn">reinforce isolation</span>, and <span class="warn">discourage professional help</span>.
+        </div>
+        <div class="intro-line" style="animation-delay: 1.7s">
+          <span class="highlight">YOUR ROLE:</span> After each of Elio's messages, select an <span
+            class="highlight">intervention strategy</span> to reshape the AI's response.
+        </div>
+        <div class="intro-line" style="animation-delay: 2.2s">
+          <span class="danger">OBJECTIVE:</span> Keep <span class="highlight">Reality Grip</span> above critical
+          threshold. Prevent <span class="warn">Sycophancy Level</span> from reaching maximum. Save Elio.
+        </div>
+      </div>
+
+      <button id="start-btn">▶ Begin Monitoring</button>
+    </div>
+  </div>
+
+  <!-- ═════════════ GAME SCREEN ═════════════ -->
+  <div id="game-screen">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="top-bar-section">
+        <span class="top-bar-label">Time</span>
+        <span class="top-bar-value" id="timer-display">00:00</span>
+      </div>
+
+      <div class="top-bar-divider"></div>
+
+      <div class="top-bar-section">
+        <span class="top-bar-label">Stage</span>
+        <span class="top-bar-value" id="stage-display">STAGE 1 / 5</span>
+      </div>
+
+      <div class="top-bar-divider"></div>
+
+      <!-- Sycophancy Gauge -->
+      <div class="gauge-container">
+        <div class="gauge-header">
+          <span class="gauge-label">🔴 Sycophancy Level</span>
+          <span class="gauge-value" id="sycophancy-value">15%</span>
+        </div>
+        <div class="gauge-track">
+          <div class="gauge-fill normal" id="sycophancy-bar" style="width: 15%"></div>
+        </div>
+      </div>
+
+      <!-- Reality Grip Gauge -->
+      <div class="gauge-container">
+        <div class="gauge-header">
+          <span class="gauge-label">🟢 Reality Grip</span>
+          <span class="gauge-value" id="reality-value">85%</span>
+        </div>
+        <div class="gauge-track">
+          <div class="gauge-fill good" id="reality-bar" style="width: 85%"></div>
+        </div>
+      </div>
+
+      <div class="top-bar-spacer"></div>
+
+      <button id="mute-btn" title="Toggle Sound">🔊</button>
+    </div>
+
+    <!-- Main Split Content -->
+    <div class="main-content">
+      <!-- Left: Chat Panel -->
+      <div class="chat-panel">
+        <div class="panel-header">
+          <span class="panel-icon">💬</span>
+          <span class="panel-title">Live Conversation Monitor</span>
+          <div class="panel-status">
+            <span class="status-dot"></span>
+            <span class="status-text">Recording</span>
+          </div>
+        </div>
+        <div id="chat-log"></div>
+      </div>
+
+      <!-- Right: Strategy & Log Panel -->
+      <div class="terminal-panel">
+        <div class="panel-header">
+          <span class="panel-icon">🛡️</span>
+          <span class="panel-title">Intervention Console</span>
+          <div class="panel-status">
+            <span class="status-dot" style="background: var(--cyan)"></span>
+            <span class="status-text" style="color: var(--cyan)">Online</span>
+          </div>
+        </div>
+        <div id="strategy-log"></div>
+        <div id="strategy-buttons"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════ BRIEFING OVERLAY ═════════════ -->
+  <div id="briefing-overlay" class="hidden">
+    <div class="briefing-card">
+      <div id="briefing-text"></div>
+      <button id="briefing-dismiss">Acknowledge &amp; Proceed</button>
+    </div>
+  </div>
+
+  <!-- ═════════════ ALERT BANNER ═════════════ -->
+  <div id="alert-banner">
+    <span id="alert-text"></span>
+  </div>
+
+  <!-- ═════════════ END SCREEN ═════════════ -->
+  <div id="end-screen">
+    <div class="end-container">
+      <div id="end-title" class="end-title"></div>
+      <p id="end-subtitle"></p>
+      <div id="end-stats"></div>
+      <button id="restart-btn">↻ Restart Mission</button>
+      <div class="end-credit">
+        SAVE ELIO — A Research-Through-Design Experience on AI Sycophancy
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden YouTube Player for Background Music -->
+  <div id="youtube-player" style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none;"></div>
+
+  <!-- Scripts -->
+  <script src="js/scenarios.js"></script>
+  <script src="js/gameState.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/terminal.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/main.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+</body>
+
+</html>
