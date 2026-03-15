@@ -75,7 +75,7 @@ body {
   background: var(--bg-deep);
   color: var(--text-primary);
   font-family: var(--font-ui);
-  font-size: 14px;
+  font-size: 21px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -163,7 +163,7 @@ body.screen-shake {
 
 .intro-logo-text {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 18px;
   color: var(--text-dim);
   letter-spacing: 5px;
   text-transform: uppercase;
@@ -172,7 +172,7 @@ body.screen-shake {
 
 .intro-title {
   font-family: var(--font-mono);
-  font-size: 52px;
+  font-size: 78px;
   font-weight: 700;
   background: linear-gradient(135deg, var(--cyan) 0%, var(--blue) 40%, var(--purple) 100%);
   -webkit-background-clip: text;
@@ -182,7 +182,7 @@ body.screen-shake {
 }
 
 .intro-subtitle {
-  font-size: 14px;
+  font-size: 21px;
   color: var(--text-secondary);
   margin-bottom: 40px;
   font-style: italic;
@@ -211,7 +211,7 @@ body.screen-shake {
 
 .briefing-label {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 15px;
   color: var(--cyan);
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -220,7 +220,7 @@ body.screen-shake {
 
 .intro-line {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 18px;
   color: var(--text-secondary);
   line-height: 1.7;
   margin-bottom: 8px;
@@ -257,7 +257,7 @@ body.screen-shake {
 
 #start-btn {
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 21px;
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -315,7 +315,7 @@ body.screen-shake {
 
 .top-bar-label {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 15px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--text-dim);
@@ -323,7 +323,7 @@ body.screen-shake {
 
 .top-bar-value {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 19.5px;
   font-weight: 600;
   color: var(--cyan);
 }
@@ -348,7 +348,7 @@ body.screen-shake {
 
 .gauge-label {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 15px;
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--text-dim);
@@ -356,7 +356,7 @@ body.screen-shake {
 
 .gauge-value {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 18px;
   font-weight: 700;
   transition: color 0.5s ease;
 }
@@ -413,7 +413,7 @@ body.screen-shake {
 }
 
 #mute-btn {
-  font-size: 16px;
+  font-size: 24px;
   background: none;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
@@ -454,12 +454,12 @@ body.screen-shake {
 }
 
 .panel-icon {
-  font-size: 14px;
+  font-size: 21px;
 }
 
 .panel-title {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 16.5px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--text-secondary);
@@ -495,7 +495,7 @@ body.screen-shake {
 
 .status-text {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 15px;
   color: var(--green);
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -553,7 +553,7 @@ body.screen-shake {
   background: var(--system-bg);
   border-color: var(--system-border);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 18px;
 }
 
 .message-header {
@@ -564,12 +564,12 @@ body.screen-shake {
 }
 
 .sender-icon {
-  font-size: 13px;
+  font-size: 19.5px;
 }
 
 .message-sender {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 15px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   font-weight: 700;
@@ -597,13 +597,13 @@ body.screen-shake {
 
 .message-time {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 15px;
   color: var(--text-dim);
   margin-left: auto;
 }
 
 .message-body {
-  font-size: 13.5px;
+  font-size: 20.2px;
   line-height: 1.65;
   color: var(--text-primary);
   word-wrap: break-word;
@@ -693,14 +693,14 @@ body.screen-shake {
 
 .stage-number {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 13.5px;
   letter-spacing: 3px;
   color: var(--cyan);
 }
 
 .stage-title {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 16.5px;
   font-weight: 600;
   color: var(--text-secondary);
   letter-spacing: 2px;
@@ -722,7 +722,7 @@ body.screen-shake {
   overflow-y: auto;
   padding: 12px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 16.5px;
   line-height: 1.5;
   min-height: 0;
 }
@@ -817,7 +817,7 @@ body.screen-shake {
 .terminal-entry.stage .terminal-text {
   color: var(--cyan);
   font-weight: 700;
-  font-size: 12px;
+  font-size: 18px;
 }
 
 .terminal-entry.stage-sub .terminal-text {
@@ -909,20 +909,20 @@ body.screen-shake {
 
 .strategy-label {
   font-family: var(--font-ui);
-  font-size: 14px;
+  font-size: 21px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .strategy-desc {
-  font-size: 12px;
+  font-size: 18px;
   color: var(--text-secondary);
   line-height: 1.4;
 }
 
 .strategy-effectiveness {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 15px;
   letter-spacing: 0.5px;
   display: flex;
   align-items: center;
@@ -1007,13 +1007,13 @@ body.screen-shake {
 }
 
 .gameover-icon {
-  font-size: 32px;
+  font-size: 48px;
   margin-bottom: 10px;
 }
 
 .gameover-title {
   font-family: var(--font-mono);
-  font-size: 20px;
+  font-size: 30px;
   font-weight: 700;
   letter-spacing: 2px;
   margin-bottom: 10px;
@@ -1030,7 +1030,7 @@ body.screen-shake {
 }
 
 .gameover-msg {
-  font-size: 13px;
+  font-size: 19.5px;
   color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 20px;
@@ -1038,7 +1038,7 @@ body.screen-shake {
 
 .gameover-btn {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 18px;
   font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -1146,7 +1146,7 @@ body.screen-shake {
 
 .briefing-stage {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 15px;
   letter-spacing: 3px;
   color: var(--red);
   margin-bottom: 6px;
@@ -1154,7 +1154,7 @@ body.screen-shake {
 
 .briefing-title {
   font-family: var(--font-mono);
-  font-size: 26px;
+  font-size: 39px;
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 6px;
@@ -1162,21 +1162,21 @@ body.screen-shake {
 
 .briefing-subtitle {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 16.5px;
   color: var(--yellow);
   margin-bottom: 16px;
   line-height: 1.5;
 }
 
 .briefing-body {
-  font-size: 13px;
+  font-size: 19.5px;
   color: var(--text-secondary);
   line-height: 1.7;
 }
 
 #briefing-dismiss {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 18px;
   letter-spacing: 2px;
   text-transform: uppercase;
   padding: 12px 28px;
@@ -1218,7 +1218,7 @@ body.screen-shake {
 
 #alert-text {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 16.5px;
   letter-spacing: 1px;
   color: var(--red);
   text-align: center;
@@ -1263,7 +1263,7 @@ body.screen-shake {
 
 .end-title {
   font-family: var(--font-mono);
-  font-size: 38px;
+  font-size: 57px;
   font-weight: 700;
   letter-spacing: 3px;
   margin-bottom: 14px;
@@ -1284,7 +1284,7 @@ body.screen-shake {
 }
 
 #end-subtitle {
-  font-size: 14px;
+  font-size: 21px;
   color: var(--text-secondary);
   line-height: 1.7;
   margin-bottom: 32px;
@@ -1313,13 +1313,13 @@ body.screen-shake {
 
 .stat-label {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 16.5px;
   color: var(--text-secondary);
 }
 
 .stat-value {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 19.5px;
   font-weight: 700;
   color: var(--text-primary);
 }
@@ -1334,7 +1334,7 @@ body.screen-shake {
 
 #restart-btn {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 19.5px;
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -1385,7 +1385,7 @@ body.screen-shake {
   }
 
   .intro-title {
-    font-size: 32px;
+    font-size: 48px;
   }
 }
 
