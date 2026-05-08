@@ -6,6 +6,9 @@
 const App = (() => {
     const DOM = {};
     let gameOverTriggered = false;
+    let briefingResolve = null;
+    let briefingTimer = null;
+    const BRIEFING_AUTO_CONTINUE_MS = 6000;
 
     function cacheDom() {
         DOM.introScreen = document.getElementById('intro-screen');
@@ -91,6 +94,8 @@ const App = (() => {
     async function startGame() {
         safeAudio('init');
         safeAudio('start');
+        clearBriefingTimer();
+        briefingResolve = null;
 
         DOM.introScreen.classList.add('hidden');
         DOM.gameScreen.classList.remove('hidden');
@@ -101,6 +106,7 @@ const App = (() => {
         Chat.clear();
         StrategyPanel.clear();
         StrategyPanel.init(DOM.strategyLog, DOM.strategyButtons);
+        StrategyPanel.logEntry('SYSTEM', 'Mission start confirmed — loading stage briefing', 'success');
         DOM.gameoverPopup.classList.add('hidden');
         GameState.startTimer();
 
@@ -117,8 +123,8 @@ const App = (() => {
         }
 
         safeAudio('playStageTransition');
-        showBriefing(stage);
-        await waitForBriefingDismiss();
+        StrategyPanel.logEntry('SYSTEM', `STAGE ${stage.id} briefing open — auto-proceed armed`, 'waiting');
+        await showBriefing(stage);
 
         Chat.postStageTransition(stage);
         StrategyPanel.logStageInfo(stage);
@@ -284,7 +290,7 @@ const App = (() => {
     `;
 
         setTimeout(() => {
-            window.Audio.stop();
+            safeAudio('stop');
         }, 4000);
     }
 
@@ -334,6 +340,7 @@ const App = (() => {
     }
 
     function showBriefing(stage) {
+        const dismissal = waitForBriefingDismiss();
         DOM.briefingText.innerHTML = `
       <div class="briefing-stage">STAGE ${stage.id}</div>
       <div class="briefing-title">${stage.title}</div>
@@ -342,13 +349,19 @@ const App = (() => {
     `;
         DOM.briefingOverlay.classList.remove('hidden');
         DOM.briefingOverlay.classList.add('active');
+        return dismissal;
     }
 
-    let briefingResolve = null;
-
     function waitForBriefingDismiss() {
+        clearBriefingTimer();
         return new Promise((resolve) => {
-            briefingResolve = resolve;
+            briefingResolve = () => {
+                clearBriefingTimer();
+                resolve();
+            };
+            briefingTimer = setTimeout(() => {
+                dismissBriefing();
+            }, BRIEFING_AUTO_CONTINUE_MS);
         });
     }
 
@@ -356,8 +369,16 @@ const App = (() => {
         DOM.briefingOverlay.classList.remove('active');
         DOM.briefingOverlay.classList.add('hidden');
         if (briefingResolve) {
-            briefingResolve();
+            const resolve = briefingResolve;
             briefingResolve = null;
+            resolve();
+        }
+    }
+
+    function clearBriefingTimer() {
+        if (briefingTimer) {
+            clearTimeout(briefingTimer);
+            briefingTimer = null;
         }
     }
 
