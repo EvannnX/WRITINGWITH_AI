@@ -57,6 +57,12 @@
   --radius-lg: 12px;
 
   --shadow-panel: 0 4px 24px rgba(0, 0, 0, 0.4);
+
+  --app-max-width: 3000px;
+  --panel-padding: 16px;
+  --chat-readable-width: 1180px;
+  --console-readable-width: 980px;
+  --topbar-padding-x: max(16px, calc((100vw - var(--app-max-width)) / 2 + 16px));
 }
 
 /* ── Reset ── */
@@ -71,6 +77,7 @@
 html,
 body {
   height: 100%;
+  width: 100%;
   overflow: hidden;
   background: var(--bg-deep);
   color: var(--text-primary);
@@ -162,9 +169,15 @@ body.screen-shake {
   width: 100%;
   max-height: calc(100vh - 48px);
   max-height: calc(100dvh - 48px);
-  overflow-y: auto;
   padding: 40px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.intro-logo {
+  flex-shrink: 0;
 }
 
 .intro-logo-text {
@@ -202,7 +215,8 @@ body.screen-shake {
   padding: 24px;
   margin-bottom: 36px;
   position: relative;
-  overflow: hidden;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .intro-briefing::before {
@@ -275,6 +289,7 @@ body.screen-shake {
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
+  flex-shrink: 0;
 }
 
 #start-btn:hover {
@@ -309,11 +324,12 @@ body.screen-shake {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 8px 16px;
+  padding: 8px var(--topbar-padding-x);
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-subtle);
   min-height: 48px;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .top-bar-section {
@@ -346,6 +362,7 @@ body.screen-shake {
 /* ── Gauges ── */
 .gauge-container {
   flex: 1;
+  min-width: 170px;
   max-width: 280px;
 }
 
@@ -361,6 +378,9 @@ body.screen-shake {
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .gauge-value {
@@ -444,6 +464,10 @@ body.screen-shake {
   overflow: hidden;
   min-height: 0;
   min-width: 0;
+  width: min(100%, var(--app-max-width));
+  margin: 0 auto;
+  border-left: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--border-subtle);
 }
 
 /* ── Chat Panel (Left) ── */
@@ -518,7 +542,7 @@ body.screen-shake {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 16px;
+  padding: var(--panel-padding);
   scroll-behavior: smooth;
 }
 
@@ -541,6 +565,8 @@ body.screen-shake {
   padding: 12px 16px;
   border-radius: var(--radius-md);
   border: 1px solid;
+  max-width: var(--chat-readable-width);
+  overflow-wrap: anywhere;
 }
 
 .chat-message.elio {
@@ -736,7 +762,7 @@ body.screen-shake {
 #strategy-log {
   flex: 1;
   overflow-y: auto;
-  padding: 12px;
+  padding: var(--panel-padding);
   font-family: var(--font-mono);
   font-size: 16.5px;
   line-height: 1.5;
@@ -760,6 +786,7 @@ body.screen-shake {
 .terminal-entry {
   margin-bottom: 3px;
   word-wrap: break-word;
+  max-width: var(--console-readable-width);
 }
 
 .terminal-time {
@@ -848,7 +875,7 @@ body.screen-shake {
 /* ── Strategy Buttons ── */
 #strategy-buttons {
   border-top: 1px solid var(--border-subtle);
-  padding: 12px;
+  padding: var(--panel-padding);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -866,7 +893,7 @@ body.screen-shake {
   max-height: min(400px, 48dvh);
   overflow-y: auto;
   opacity: 1;
-  padding: 12px;
+  padding: var(--panel-padding);
 }
 
 .strategy-btn {
@@ -883,6 +910,8 @@ body.screen-shake {
   opacity: 0;
   transform: translateY(8px);
   animation: strategy-enter 0.35s ease forwards;
+  max-width: var(--console-readable-width);
+  overflow-wrap: anywhere;
 }
 
 @keyframes strategy-enter {
@@ -1387,8 +1416,18 @@ body.screen-shake {
    ═══════════════════════════════════════ */
 
 @media (max-width: 900px) {
+  :root {
+    --panel-padding: 12px;
+    --chat-readable-width: none;
+    --console-readable-width: none;
+    --topbar-padding-x: 10px;
+  }
+
   .main-content {
     flex-direction: column;
+    width: 100%;
+    border-left: none;
+    border-right: none;
   }
 
   .chat-panel {
@@ -1406,10 +1445,11 @@ body.screen-shake {
   .top-bar {
     flex-wrap: wrap;
     gap: 8px;
-    padding: 6px 10px;
+    padding: 6px var(--topbar-padding-x);
   }
 
   .gauge-container {
+    min-width: 150px;
     max-width: 180px;
   }
 
@@ -1419,16 +1459,183 @@ body.screen-shake {
 }
 
 @media (max-width: 600px) {
+  body {
+    font-size: 18px;
+  }
+
+  #intro-screen,
+  #briefing-overlay {
+    padding: 12px;
+  }
+
+  .intro-container {
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
+    padding: 18px;
+  }
+
+  .intro-logo-text {
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+
+  .intro-title {
+    font-size: 40px;
+  }
+
+  .intro-subtitle {
+    font-size: 16px;
+  }
+
+  .briefing-label,
+  .intro-line {
+    font-size: 14px;
+  }
+
+  #start-btn {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+  }
+
+  .top-bar {
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+
   .top-bar-section:not(.gauge-container) {
     display: none;
   }
 
-  .top-bar {
-    justify-content: center;
+  .top-bar-divider,
+  .top-bar-spacer {
+    display: none;
   }
 
   .gauge-container {
-    max-width: 45%;
+    flex: 1 1 calc(50% - 32px);
+    min-width: 0;
+    max-width: none;
+  }
+
+  .gauge-label {
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .gauge-value {
+    font-size: 15px;
+  }
+
+  #mute-btn {
+    width: 36px;
+    min-width: 36px;
+    font-size: 20px;
+    padding: 2px 4px;
+  }
+
+  .panel-header {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .panel-title {
+    font-size: 12px;
+    letter-spacing: 0.8px;
+  }
+
+  .panel-icon {
+    font-size: 18px;
+  }
+
+  .status-text {
+    display: none;
+  }
+
+  .chat-message {
+    padding: 10px 12px;
+    margin-bottom: 12px;
+  }
+
+  .message-body {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .message-sender,
+  .message-time {
+    font-size: 12px;
+    letter-spacing: 0.8px;
+  }
+
+  #strategy-log {
+    font-size: 12.5px;
+  }
+
+  .strategy-btn {
+    padding: 10px 12px;
+  }
+
+  .strategy-label {
+    font-size: 16px;
+  }
+
+  .strategy-desc {
+    font-size: 14px;
+  }
+
+  .strategy-effectiveness {
+    font-size: 12px;
+  }
+
+  .briefing-card {
+    width: 100%;
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
+    padding: 18px;
+  }
+
+  .briefing-title {
+    font-size: 27px;
+  }
+
+  .briefing-subtitle {
+    font-size: 13.5px;
+  }
+
+  .briefing-body {
+    font-size: 15.5px;
+    line-height: 1.55;
+  }
+
+  #briefing-dismiss {
+    font-size: 14px;
+    letter-spacing: 1px;
+    padding: 11px 12px;
+  }
+
+  .end-container {
+    width: 100%;
+    padding: 16px;
+  }
+
+  .end-title {
+    font-size: 36px;
+  }
+
+  #end-subtitle {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .stat-row {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .stat-label,
+  .stat-value {
+    font-size: 14px;
   }
 }
 
@@ -1477,6 +1684,98 @@ body.screen-shake {
   .briefing-body {
     font-size: 18px;
     line-height: 1.55;
+  }
+}
+
+@media (min-width: 1400px) {
+  :root {
+    --panel-padding: 20px;
+    --chat-readable-width: 1240px;
+    --console-readable-width: 1040px;
+  }
+
+  .chat-panel {
+    flex: 1.28;
+  }
+
+  .terminal-panel {
+    flex: 1;
+  }
+}
+
+@media (min-width: 1900px) {
+  :root {
+    --panel-padding: 24px;
+    --chat-readable-width: 1320px;
+    --console-readable-width: 1120px;
+  }
+
+  .top-bar {
+    gap: 22px;
+    min-height: 56px;
+  }
+
+  .gauge-container {
+    max-width: 360px;
+  }
+
+  .chat-panel {
+    flex: 1.35;
+  }
+
+  .terminal-panel {
+    flex: 0.95;
+  }
+
+  .chat-message {
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+
+  #strategy-buttons.active {
+    max-height: min(460px, 44dvh);
+  }
+
+  .strategy-btn {
+    padding: 14px 18px;
+  }
+
+  .briefing-card {
+    max-width: 640px;
+  }
+
+  .intro-container {
+    max-width: 760px;
+  }
+}
+
+@media (min-width: 3001px) {
+  .main-content {
+    box-shadow: 0 0 0 1px rgba(48, 64, 88, 0.18),
+      0 0 60px rgba(0, 0, 0, 0.22);
+  }
+}
+
+@media (max-height: 620px) {
+  .top-bar {
+    min-height: 42px;
+  }
+
+  .panel-header {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .chat-message {
+    margin-bottom: 10px;
+  }
+
+  .message-body {
+    line-height: 1.5;
+  }
+
+  #strategy-buttons.active {
+    max-height: min(320px, 42dvh);
   }
 }
 
