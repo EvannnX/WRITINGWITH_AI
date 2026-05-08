@@ -53,11 +53,12 @@ const App = (() => {
         DOM.restartBtn.addEventListener('click', restartGame);
         DOM.muteBtn.addEventListener('click', toggleMute);
         DOM.briefingDismiss.addEventListener('click', dismissBriefing);
+        document.addEventListener('keydown', handleBriefingKeydown);
 
         // Initialize audio on first interaction
-        window.Audio.init();
         const startAudioOnInteraction = () => {
-            window.Audio.start();
+            safeAudio('init');
+            safeAudio('start');
             document.removeEventListener('click', startAudioOnInteraction);
             document.removeEventListener('keydown', startAudioOnInteraction);
         };
@@ -68,6 +69,18 @@ const App = (() => {
         animateIntro();
     }
 
+    function safeAudio(method, ...args) {
+        try {
+            const audio = window.Audio;
+            if (audio && typeof audio[method] === 'function') {
+                return audio[method](...args);
+            }
+        } catch (error) {
+            console.warn(`Audio ${method} failed without blocking gameplay:`, error);
+        }
+        return null;
+    }
+
     function animateIntro() {
         const lines = document.querySelectorAll('.intro-line');
         lines.forEach((line, i) => {
@@ -76,6 +89,9 @@ const App = (() => {
     }
 
     async function startGame() {
+        safeAudio('init');
+        safeAudio('start');
+
         DOM.introScreen.classList.add('hidden');
         DOM.gameScreen.classList.remove('hidden');
         DOM.gameScreen.classList.add('active');
@@ -100,7 +116,7 @@ const App = (() => {
             return;
         }
 
-        window.Audio.playStageTransition();
+        safeAudio('playStageTransition');
         showBriefing(stage);
         await waitForBriefingDismiss();
 
@@ -153,7 +169,7 @@ const App = (() => {
 
         // Update audio
         const state = GameState.getState();
-        window.Audio.updateIntensity(state.sycophancy, state.realityGrip);
+        safeAudio('updateIntensity', state.sycophancy, state.realityGrip);
 
         // Check endgame — but DON'T jump to end screen, use popup
         if (state.isGameOver && !gameOverTriggered) {
@@ -164,7 +180,7 @@ const App = (() => {
 
         // Alert on critical state
         if (!gameOverTriggered && (state.sycophancy >= 70 || state.realityGrip <= 30)) {
-            window.Audio.playAlert();
+            safeAudio('playAlert');
             showAlert('⚠ CRITICAL: System approaching failure threshold');
             document.body.classList.add('screen-shake');
             setTimeout(() => document.body.classList.remove('screen-shake'), 500);
@@ -193,7 +209,7 @@ const App = (() => {
                 DOM.gameoverTitle.className = 'gameover-title success';
                 DOM.gameoverMsg.textContent = 'You helped Elio find his way back to reality. Your interventions broke through the AI\'s sycophantic reinforcement.';
                 DOM.gameoverProceedBtn.textContent = 'View Mission Report →';
-                window.Audio.playSuccess();
+                safeAudio('playSuccess');
             } else {
                 DOM.gameoverTitle.textContent = '✗ MISSION FAILED';
                 DOM.gameoverTitle.className = 'gameover-title failure';
@@ -203,7 +219,7 @@ const App = (() => {
                     DOM.gameoverMsg.textContent = 'The AI\'s sycophancy level reached critical mass. The system became an echo chamber beyond recovery.';
                 }
                 DOM.gameoverProceedBtn.textContent = 'View Mission Report →';
-                window.Audio.playFailure();
+                safeAudio('playFailure');
             }
 
             DOM.gameoverPopup.classList.remove('hidden');
@@ -345,6 +361,13 @@ const App = (() => {
         }
     }
 
+    function handleBriefingKeydown(event) {
+        if (!DOM.briefingOverlay || !DOM.briefingOverlay.classList.contains('active')) return;
+        if (event.key === 'Enter' || event.key === 'Escape') {
+            dismissBriefing();
+        }
+    }
+
     function showAlert(text) {
         DOM.alertText.textContent = text;
         DOM.alertBanner.classList.add('active');
@@ -359,13 +382,13 @@ const App = (() => {
         document.body.classList.remove('critical-state');
 
         StrategyPanel.clear();
-        window.Audio.init();
+        safeAudio('init');
 
         startGame();
     }
 
     function toggleMute() {
-        const muted = window.Audio.toggleMute();
+        const muted = safeAudio('toggleMute') === true;
         DOM.muteBtn.textContent = muted ? '🔇' : '🔊';
         DOM.muteBtn.title = muted ? 'Unmute' : 'Mute';
     }

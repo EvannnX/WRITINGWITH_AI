@@ -55,7 +55,7 @@ const StrategyPanel = (() => {
         isLocked = true;
 
         // Audio click
-        window.Audio.playClick();
+        playAudio('playClick');
 
         // Visual feedback — highlight selected button
         const btns = buttonsContainer.querySelectorAll('.strategy-btn');
@@ -80,9 +80,9 @@ const StrategyPanel = (() => {
         logEntry('SYSTEM', `${effLabel} — ${strategy.description}`, effType);
 
         if (strategy.effectiveness === 'good') {
-            window.Audio.playSuccess();
+            playAudio('playSuccess');
         } else if (strategy.effectiveness === 'bad') {
-            window.Audio.playFailure();
+            playAudio('playFailure');
         }
 
         // Notify callback
@@ -129,6 +129,17 @@ const StrategyPanel = (() => {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    function playAudio(method) {
+        try {
+            const audio = window.Audio;
+            if (audio && typeof audio[method] === 'function') {
+                audio[method]();
+            }
+        } catch (error) {
+            console.warn(`Audio ${method} failed without blocking interaction:`, error);
+        }
     }
 
     return {
